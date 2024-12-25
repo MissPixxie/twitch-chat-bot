@@ -58,15 +58,12 @@ function handleWebSocketMessage(data, OAuthToken) {
 		case "notification": // An EventSub notification has occurred, such as channel.chat.message
 			switch (data.metadata.subscription_type) {
 				case "channel.chat.message":
-					// First, print the message to the program's console.
 					console.log(
 						`MSG #${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
 					);
 
-					// Then check to see if that message was "HeyGuys"
-					if (data.payload.event.message.text.trim() == "HeyGuys") {
-						// If so, send back "VoHiYo" to the chatroom
-						sendChatMessage("VoHiYo");
+					if (data.payload.event.message.text.trim() == "!Feed") {
+						sendChatMessage("You've fed Timmy", OAuthToken);
 					}
 
 					break;
@@ -75,11 +72,11 @@ function handleWebSocketMessage(data, OAuthToken) {
 	}
 }
 
-async function sendChatMessage(chatMessage) {
+async function sendChatMessage(chatMessage, OAuthToken) {
 	let response = await fetch("https://api.twitch.tv/helix/chat/messages", {
 		method: "POST",
 		headers: {
-			Authorization: "Bearer " + OAUTH_TOKEN,
+			Authorization: "Bearer " + OAuthToken,
 			"Client-Id": CLIENT_ID,
 			"Content-Type": "application/json",
 		},
