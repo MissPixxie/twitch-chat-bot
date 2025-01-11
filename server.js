@@ -59,8 +59,7 @@ server.get("/callback", async (req, res) => {
 		// Attempt to start bot
 		if (!isBotStarted) {
 			let botStarted = await startBot();
-			// Render success page
-			res.send(createAuthSuccessHTML(botStarted));
+			res.redirect("/");
 		}
 	} catch (error) {
 		console.error("Authentication error:", error);
@@ -87,18 +86,6 @@ async function exchangeAuthorizationCodeForToken(code) {
 		throw new Error(`Token request failed: ${JSON.stringify(data)}`);
 	}
 	return data;
-}
-
-function createAuthSuccessHTML(botStarted) {
-	return `
-      <html>
-        <body>
-          <h1>Authorization Successful!</h1>
-          <p>Bot status: ${botStarted ? "Running" : "Failed to start"}</p>
-          <p>You can close this window.</p>
-        </body>
-      </html>
-    `;
 }
 
 server.listen(PORT, async () => {

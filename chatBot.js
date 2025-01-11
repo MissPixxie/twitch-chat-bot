@@ -55,8 +55,9 @@ function handleWebSocketMessage(data, OAuthToken) {
 					console.log(
 						`MSG #${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
 					);
+					console.log(data.payload.event.message.text);
 					// gör till lowercase inna du kollar
-					if (data.payload.event.message.text.trim() == "!Feed") {
+					if (data.payload.event.message.text.trim() == "!feed") {
 						sendChatMessage("You've fed Timmy", OAuthToken);
 					}
 

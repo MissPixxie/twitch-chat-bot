@@ -4,27 +4,11 @@
     <meta charset="UTF-8" />
     <title>Emelie Hansson</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=VT323&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body>
-    <h1>Javascript Tamagotchi</h1>
     <div id="gamecontainer">
       <div id="container">
-        <div id="Moodmeter"></div>
-        <!-- <div id="love_meter">Love: 0</div>
-        <div id="hunger_meter">Hunger: 0</div>
-        <div id="fun_meter">Fun: 0</div>
-        <div id="bath_meter">Bath: 0</div>
-        <div id="tired_meter">Tired: 0</div> -->
-      </div>
       <div id="tamaDiv">
-        <!--<div class="thought_bubble"><img src="bubble.png" style="width: 130px; height: 100px;"></div>-->
         <div class="tamagotchi"><img src="Images/tama1png.png" /></div>
         <div class="tamagotchi"><img src="Images/tama2png.png" /></div>
         <div class="tamagotchi"><img src="Images/tamahappy.png" /></div>
@@ -32,61 +16,6 @@
         <div class="tamagotchi"><img src="Images/tamaunhappy2.png" /></div>
         <div class="tamagotchi"><img src="Images/tamasad.png" /></div>
         <div class="tamagotchi"><img src="Images/tamasad2.png" /></div>
-      </div>
-    </div>
-
-    <div id="button-container">
-      <button class="button" onclick="love()">Pet</button>
-      <button id="foodButton" onclick="hunger()">Feed</button>
-      <button class="button" onclick="fun()">Play</button>
-      <button class="button" onclick="bath()">Bath</button>
-      <button class="button" onclick="tired()">Sleep</button>
-    </div>
-
-    <div id="testContainer">
-      <div class="tamaDiv">
-        <!--<div class="thought_bubble"><img src="bubble.png" style="width: 130px; height: 100px;"></div>-->
-        <div class="tamagotchi"><img src="Images/tama1png.png" /></div>
-        <div class="tamagotchi"><img src="Images/tama2png.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamahappy.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamaunhappy.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamaunhappy2.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamasad.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamasad2.png" /></div>
-      </div>
-    </div>
-
-    <div id="myModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <span class="close">&times;</span>
-        </div>
-        <div class="modal-main">
-          <input
-            type="image"
-            name="banana"
-            class="modal-image"
-            src="Images/banana.png"
-            onclick="hunger(5)"
-          />
-          <input
-            type="image"
-            name="hamburger"
-            class="modal-image"
-            src="Images/hamburger.png"
-            onclick="hunger(8)"
-          />
-          <input
-            type="image"
-            name="apple"
-            class="modal-image"
-            src="Images/apple.png"
-            onclick="hunger(6)"
-          />
-        </div>
-        <div class="modal-footer">
-          <button class="button close-button">Close</button>
-        </div>
       </div>
     </div>
   </body>

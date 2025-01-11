@@ -40,11 +40,7 @@ async function goSleep(ms) {
 	for (var i = 0; i < tama.length; i++) {
 		tama[i].style.display = "none";
 	}
-	document.getElementById("gamecontainer").style.filter = "brightness(35%)";
-	document.getElementById("gamecontainer").style.backgroundColor = "#92a8d1";
 	await sleep(ms);
-	document.getElementById("gamecontainer").style.filter = "brightness(100%)";
-	document.getElementById("gamecontainer").style.backgroundColor = "#e6f9ff";
 	tama[0].style.display = "block";
 	stop();
 	start();
@@ -113,8 +109,6 @@ setInterval(time, 36000);
 function getValues(love, hunger, fun, bath, tired) {
 	const testMood = [];
 	testMood.push(tamagotchi.love, tamagotchi.hunger);
-
-	console.log(testMood);
 
 	var mood =
 		tamagotchi.love +
@@ -215,31 +209,6 @@ function flip() {
 	}
 }
 
-// keybindings
-const testDiv = document.getElementById("test");
-
-document.addEventListener("keydown", (e) => {
-	if (e.key === "ArrowLeft") {
-		let currentPosition = testDiv.offsetLeft;
-		testDiv.style.left = currentPosition - 50 + "px";
-		console.log("left arrow pressed");
-	} else if (e.key === "ArrowRight") {
-		let currentPosition = testDiv.offsetLeft;
-		testDiv.style.left = currentPosition + 50 + "px";
-
-		console.log("right arrow pressed");
-	}
-});
-
-// var newPosition = 50;
-// // window.addEventListener("keydown", moveTamagotchi);
-//  function moveTamagotchi() {
-//   testDiv.style.right=newPosition + 'px';
-//   if ( riktning === 'höger') {
-//     newPosition = newPosition+50;
-//   }
-//  }
-
 var tamaMove = setInterval(tamaSlide, 900);
 var tamaFlip = setInterval(flip, 30);
 
@@ -254,30 +223,3 @@ function start() {
 	tamaMove = setInterval(tamaSlide, 900);
 	tamaFlip = setInterval(flip, 30);
 }
-
-// MODAL //
-var modal = document.getElementById("myModal");
-var foodButton = document.getElementById("foodButton");
-var spanClose = document.getElementsByClassName("close")[0];
-var buttonClose = document.getElementsByClassName("close-button")[0];
-
-foodButton.onclick = function () {
-	modal.style.display = "block";
-};
-
-function closeOnFoodClick() {
-	modal.style.display = "none";
-}
-
-spanClose.onclick = function () {
-	modal.style.display = "none";
-};
-buttonClose.onclick = function () {
-	modal.style.display = "none";
-};
-
-window.onclick = function (event) {
-	if (event.target == modal) {
-		modal.style.display = "none";
-	}
-};
