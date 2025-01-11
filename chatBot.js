@@ -1,33 +1,27 @@
 import WebSocket from "ws";
 import dotenv from "dotenv";
-import { getAppToken } from "./getAppToken.js";
-import { getUserToken } from "./getUserToken.js";
 
 dotenv.config();
 
 const BOT_USER_ID = process.env.BOT_USER_ID; // This is the User ID of the chat bot
 const CLIENT_ID = process.env.TWITCH_CLIENT_ID;
-
 const CHAT_CHANNEL_USER_ID = process.env.CHAT_CHANNEL_USER_ID; // This is the User ID of the channel that the bot will join and listen to chat messages of
-
 const EVENTSUB_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 
 var websocketSessionID;
 
 // Start executing the bot from here
 export const startBot = async () => {
-	// Verify that the authentication is valid
-	const appToken = getAppToken();
 	// Get OAuth token
-	const OAuthToken = await getUserToken();
-	if (!OAuthToken) {
-		throw new Error("ValidationToken is undefined");
+	if (!process.env.USER_ACCESS_TOKEN) {
+		console.log("you need an access token");
+		return;
+	} else {
+		// Start WebSocket client and register handlers
+		const websocketClient = startWebSocketClient(
+			process.env.USER_ACCESS_TOKEN
+		);
 	}
-
-	console.log(OAuthToken);
-
-	// Start WebSocket client and register handlers
-	const websocketClient = startWebSocketClient(OAuthToken);
 };
 
 function startWebSocketClient(OAuthToken) {
@@ -61,7 +55,7 @@ function handleWebSocketMessage(data, OAuthToken) {
 					console.log(
 						`MSG #${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
 					);
-
+					// gör till lowercase inna du kollar
 					if (data.payload.event.message.text.trim() == "!Feed") {
 						sendChatMessage("You've fed Timmy", OAuthToken);
 					}
@@ -127,7 +121,7 @@ async function registerEventSubListeners(OAuthToken) {
 				response.status
 		);
 		console.error(data);
-		process.exit(1);
+		//process.exit(1);
 	} else {
 		const data = await response.json();
 		console.log(`Subscribed to channel.chat.message [${data.data[0].id}]`);
