@@ -1,5 +1,8 @@
-import WebSocket from "ws";
+import WebSocket, { WebSocketServer } from "ws";
 import dotenv from "dotenv";
+import http from "http";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 dotenv.config();
 
@@ -11,7 +14,7 @@ const EVENTSUB_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 var websocketSessionID;
 
 // Start executing the bot from here
-export const startBot = async () => {
+export const startBot = async (io) => {
 	// Get OAuth token
 	if (!process.env.USER_ACCESS_TOKEN) {
 		console.log("you need an access token");
@@ -19,12 +22,14 @@ export const startBot = async () => {
 	} else {
 		// Start WebSocket client and register handlers
 		const websocketClient = startWebSocketClient(
-			process.env.USER_ACCESS_TOKEN
+			process.env.USER_ACCESS_TOKEN,
+			io
 		);
+		//tama.initTamagotchiWebSocketServer();
 	}
 };
 
-function startWebSocketClient(OAuthToken) {
+export function startWebSocketClient(OAuthToken, io) {
 	let websocketClient = new WebSocket(EVENTSUB_WEBSOCKET_URL);
 
 	websocketClient.on("error", console.error);
@@ -34,20 +39,19 @@ function startWebSocketClient(OAuthToken) {
 	});
 
 	websocketClient.on("message", (data) => {
-		handleWebSocketMessage(JSON.parse(data.toString()), OAuthToken);
+		handleWebSocketMessage(JSON.parse(data.toString()), OAuthToken, io);
 	});
 
 	return websocketClient;
 }
 
-function handleWebSocketMessage(data, OAuthToken) {
-	console.log(data.metadata.message_type);
+async function handleWebSocketMessage(data, OAuthToken, io) {
 	switch (data.metadata.message_type) {
 		case "session_welcome": // First message you get from the WebSocket server when connecting
 			websocketSessionID = data.payload.session.id; // Register the Session ID it gives us
-
 			// Listen to EventSub, which joins the chatroom from your bot's account
 			registerEventSubListeners(OAuthToken);
+			//initTamagotchiWebSocketServer();
 			break;
 		case "notification": // An EventSub notification has occurred, such as channel.chat.message
 			switch (data.metadata.subscription_type) {
@@ -55,10 +59,15 @@ function handleWebSocketMessage(data, OAuthToken) {
 					console.log(
 						`MSG #${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
 					);
-					console.log(data.payload.event.message.text);
-					// gör till lowercase inna du kollar
+					io.emit(
+						"botMessage",
+						`${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}>: ${data.payload.event.message.text}`
+					);
 					if (data.payload.event.message.text.trim() == "!feed") {
 						sendChatMessage("You've fed Timmy", OAuthToken);
+						// sendCommandToTamagotchi(
+						// 	data.payload.event.message.text.trim()
+						// );
 					}
 
 					break;
@@ -66,6 +75,46 @@ function handleWebSocketMessage(data, OAuthToken) {
 			break;
 	}
 }
+
+// async function initTamagotchiWebSocketServer() {
+// 	const server = http.createServer();
+// 	server.listen(8080, () => {
+// 		console.log("Tamagotchi WebSocket server running on port 8080");
+// 	});
+// 	let websocketClient = new WebSocketServer({ server });
+
+// 	websocketClient.on("error", console.error);
+
+// 	websocketClient.on("open", () => {
+// 		console.log("WebSocket connection opened to " + server);
+// 	});
+
+// 	// websocketClient.on("message", (data) => {
+// 	// 	handleWebSocketMessage(JSON.parse(data.toString()));
+// 	// });
+
+// 	return websocketClient;
+// }
+// const httpServer = createServer();
+// const io = new Server(httpServer, {
+// 	// options
+// });
+// httpServer.listen(3001);
+
+// async function sendCommandToTamagotchi(chatMessage) {
+// 	console.info(req._readableState.buffer.toString());
+// 	io.on("connection", (socket) => {
+// 		console.log("connected");
+
+// 		socket.on("chatMessage", (message) => {
+// 			console.log("message from frontend " + message);
+// 		});
+
+// 		socket.emit("botMessage", "Hewwo from bot", (response) => {
+// 			console.log(response); // "got it"
+// 		});
+// 	});
+// }
 
 async function sendChatMessage(chatMessage, OAuthToken) {
 	let response = await fetch("https://api.twitch.tv/helix/chat/messages", {
@@ -126,5 +175,7 @@ async function registerEventSubListeners(OAuthToken) {
 	} else {
 		const data = await response.json();
 		console.log(`Subscribed to channel.chat.message [${data.data[0].id}]`);
+		//const server = tamaServer();
+		//test();
 	}
 }

@@ -2,19 +2,32 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-import { getAppToken } from "./getAppToken.js";
-import { getUserToken } from "./getUserToken.js";
 import { startBot } from "./chatBot.js";
 import { updateEnvFile } from "./tokenManager.js";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const server = express();
+const httpInstance = createServer(server);
+const io = new Server(httpInstance);
 const PORT = 3000;
 
 server.use(express.static(path.join(__dirname, "public")));
+
+io.on("connection", (socket) => {
+	console.log("A user connected");
+
+	// Skicka en initial hälsning till frontend
+	socket.emit("botMessage", "Bot is now connected!");
+
+	socket.on("disconnect", () => {
+		console.log("A user disconnected");
+	});
+});
 
 // Routes
 server.get("/", async (req, res) => {
@@ -39,6 +52,18 @@ server.get("/auth", (req, res) => {
 	authUrl.searchParams.set("scope", scope);
 	// Redirects to route "/callback/" to get the authorization code from params
 	res.redirect(authUrl.toString());
+});
+
+server.post("/commands", async (req, res) => {
+	//let storedMessage = JSON.parse(req.body);
+	console.info(new Response());
+	//console.log(res);
+	// debugger;
+	//res.redirect("/getCommands");
+});
+
+server.get("/getCommands", async (req, res) => {
+	res.json({ message: storedMessage });
 });
 
 let isBotStarted = false;
@@ -88,11 +113,11 @@ async function exchangeAuthorizationCodeForToken(code) {
 	return data;
 }
 
-server.listen(PORT, async () => {
+httpInstance.listen(PORT, async () => {
 	console.log(`Server running on http://localhost:3000`);
 	// Attempt initial bot start
 	try {
-		let botStarted = await startBot();
+		let botStarted = await startBot(io);
 		if (botStarted) {
 			console.log("Bot successfully started!");
 		} else {

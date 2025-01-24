@@ -2,9 +2,34 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Emelie Hansson</title>
     <link rel="stylesheet" href="style.css" />
-  </head>
+<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+            <script>
+
+              //document.addEventListener('DOMContentLoaded', function () {
+              const socket = io("http://localhost:3000");
+              const testDiv = document.getElementById("myDiv");
+              socket.on("connect", (message) => {
+                console.log("connected")
+                socket.on("botMessage", (message) => {
+                  console.log("message recieved")
+                })
+                //const testDiv = document.getElementById("myDiv").innerHTML += 'Success';
+              });
+
+              //   let wss = new WebSocket("http://localhost:3000/getCommands")
+              //               const response = await fetch('http://localhost:3000/getCommands')
+              //   try {
+              //     let data = await response.json();
+              //     console.log(data);
+              //   }
+              //   catch (error) {
+              //     console.error(error.message)
+              //   }
+              //   console.log("page is fully loaded");
+              //})
+            </script>
+</head>
   <body>
     <div id="gamecontainer">
       <div id="container">
@@ -18,6 +43,6 @@
         <div class="tamagotchi"><img src="Images/tamasad2.png" /></div>
       </div>
     </div>
+    </div>
   </body>
-  <script type="text/javascript" src="funktioner.js"></script>
 </html>

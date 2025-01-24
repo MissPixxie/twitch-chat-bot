@@ -50,7 +50,7 @@ export async function updateRefreshToken(newRefreshToken) {
 	try {
 		const envPath = path.resolve(process.cwd(), ".env");
 		let envContent = await fs.readFile(envPath, "utf-8");
-
+		console.log(envContent);
 		// Update or add REFRESH_TOKEN
 		if (envContent.includes("REFRESH_TOKEN=")) {
 			envContent = envContent.replace(
