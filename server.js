@@ -18,17 +18,6 @@ const PORT = 3000;
 
 server.use(express.static(path.join(__dirname, "public")));
 
-io.on("connection", (socket) => {
-	console.log("A user connected");
-
-	// Skicka en initial hälsning till frontend
-	socket.emit("botMessage", "Bot is now connected!");
-
-	socket.on("disconnect", () => {
-		console.log("A user disconnected");
-	});
-});
-
 // Routes
 server.get("/", async (req, res) => {
 	res.sendFile(path.join(__dirname, "public/index.html"));
@@ -52,18 +41,6 @@ server.get("/auth", (req, res) => {
 	authUrl.searchParams.set("scope", scope);
 	// Redirects to route "/callback/" to get the authorization code from params
 	res.redirect(authUrl.toString());
-});
-
-server.post("/commands", async (req, res) => {
-	//let storedMessage = JSON.parse(req.body);
-	console.info(new Response());
-	//console.log(res);
-	// debugger;
-	//res.redirect("/getCommands");
-});
-
-server.get("/getCommands", async (req, res) => {
-	res.json({ message: storedMessage });
 });
 
 let isBotStarted = false;

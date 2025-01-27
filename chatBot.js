@@ -1,8 +1,6 @@
 import WebSocket, { WebSocketServer } from "ws";
 import dotenv from "dotenv";
-import http from "http";
-import { createServer } from "http";
-import { Server } from "socket.io";
+import { handleTamaMessages } from "./handleTamaMessages.js";
 
 dotenv.config();
 
@@ -18,14 +16,14 @@ export const startBot = async (io) => {
 	// Get OAuth token
 	if (!process.env.USER_ACCESS_TOKEN) {
 		console.log("you need an access token");
-		return;
+		return false;
 	} else {
 		// Start WebSocket client and register handlers
 		const websocketClient = startWebSocketClient(
 			process.env.USER_ACCESS_TOKEN,
 			io
 		);
-		//tama.initTamagotchiWebSocketServer();
+		return true;
 	}
 };
 
@@ -59,62 +57,19 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 					console.log(
 						`MSG #${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
 					);
-					io.emit(
-						"botMessage",
-						`${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}>: ${data.payload.event.message.text}`
+					let tamaAnswer = handleTamaMessages(
+						io,
+						data.payload.event.message.text,
+						data.payload.event.chatter_user_login
 					);
-					if (data.payload.event.message.text.trim() == "!feed") {
-						sendChatMessage("You've fed Timmy", OAuthToken);
-						// sendCommandToTamagotchi(
-						// 	data.payload.event.message.text.trim()
-						// );
+					if (tamaAnswer) {
+						sendChatMessage(tamaAnswer.toString(), OAuthToken);
 					}
-
 					break;
 			}
 			break;
 	}
 }
-
-// async function initTamagotchiWebSocketServer() {
-// 	const server = http.createServer();
-// 	server.listen(8080, () => {
-// 		console.log("Tamagotchi WebSocket server running on port 8080");
-// 	});
-// 	let websocketClient = new WebSocketServer({ server });
-
-// 	websocketClient.on("error", console.error);
-
-// 	websocketClient.on("open", () => {
-// 		console.log("WebSocket connection opened to " + server);
-// 	});
-
-// 	// websocketClient.on("message", (data) => {
-// 	// 	handleWebSocketMessage(JSON.parse(data.toString()));
-// 	// });
-
-// 	return websocketClient;
-// }
-// const httpServer = createServer();
-// const io = new Server(httpServer, {
-// 	// options
-// });
-// httpServer.listen(3001);
-
-// async function sendCommandToTamagotchi(chatMessage) {
-// 	console.info(req._readableState.buffer.toString());
-// 	io.on("connection", (socket) => {
-// 		console.log("connected");
-
-// 		socket.on("chatMessage", (message) => {
-// 			console.log("message from frontend " + message);
-// 		});
-
-// 		socket.emit("botMessage", "Hewwo from bot", (response) => {
-// 			console.log(response); // "got it"
-// 		});
-// 	});
-// }
 
 async function sendChatMessage(chatMessage, OAuthToken) {
 	let response = await fetch("https://api.twitch.tv/helix/chat/messages", {
