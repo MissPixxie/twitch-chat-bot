@@ -2,9 +2,37 @@
 //
 //
 
+// class TamaSocket {
+// 	constructor() {
+// 		this.socket = null;
+// 	}
+// 	frontendConnection(io) {
+// 		io.on("connection", (socket) => {
+// 			console.log("A user connected");
+// 			this.socket = socket;
+// 		});
+// 	}
+
+// 	sendMessage(typeOfMessage, messageToSend) {
+// 		let message = new Message(typeOfMessage, messageToSend);
+// 	}
+// }
+
+// class Message {
+// 	constructor(typeOfMessage, message) {
+// 		this.typeOfMessage = null;
+// 		this.message = null;
+// 	}
+// 	sendMessage(io, message) {
+// 		io.emit("botMessage", message);
+// 	}
+// }
+
+// export { TamaSocket, Message };
+
 function getCommands() {
 	return [
-		" !feed - Feed Timmy :Kappa:",
+		" !feed - Feed Timmy",
 		" !bath - Give Timmy a bath",
 		" !sleep - Make Timmy take a nap",
 		" !play - Play with Timmy",
@@ -12,9 +40,16 @@ function getCommands() {
 	];
 }
 
-export function handleTamaMessages(io, message, chatter) {
+export async function handleTamaMessages(io, message, chatter) {
 	let answer = returnMessage(message, chatter);
+
+	sendMessageToTama(io, message);
+
 	return answer;
+}
+
+function sendMessageToTama(io, message) {
+	io.emit("botMessage", message);
 }
 
 function returnMessage(message, chatter) {

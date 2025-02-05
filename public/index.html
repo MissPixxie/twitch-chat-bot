@@ -10,10 +10,27 @@
               socket.on("connect", (message) => {
                 console.log("connected")
                 socket.on("botMessage", (message) => {
-                  console.log(message)
+                  switch(message) {
+                    case "!love":
+                    love();
+                    break;
+                    case "!feed":
+                      hunger();
+                      break;
+                      case "!play":
+                        fun();
+                        break;
+                        case "!bath":
+                          bath();
+                          break;
+                          case "!sleep":
+                            sleep();
+                            break;
+                  }
                 })
               });
-              const tamagotchi = { love: 10, hunger: 10, fun: 0, bath: 0, tired: 0 };
+
+              const tamagotchi = { love: 0, hunger: 0, fun: 0, bath: 0, tired: 0 };
 
                 // Funktionen check kollar så att värdena som dom olika känslo funktionerna försöker lägga till inte överstiger 10 eller
                 // understiger 0 eftersom det är max och minimum
@@ -55,11 +72,7 @@
                   for (var i = 0; i < tama.length; i++) {
                     tama[i].style.display = "none";
                   }
-                  document.getElementById("gamecontainer").style.filter = "brightness(35%)";
-                  document.getElementById("gamecontainer").style.backgroundColor = "#92a8d1";
                   await sleep(ms);
-                  document.getElementById("gamecontainer").style.filter = "brightness(100%)";
-                  document.getElementById("gamecontainer").style.backgroundColor = "#e6f9ff";
                   tama[0].style.display = "block";
                   stop();
                   start();
@@ -73,8 +86,8 @@
                   appreciation();
                 }
 
-                function hunger(food) {
-                  tamagotchi.hunger = check(tamagotchi.hunger, food);
+                function hunger() {
+                  tamagotchi.hunger = check(tamagotchi.hunger, 3);
                   tamagotchi.tired = check(tamagotchi.tired, -1);
 
                   getValues();
@@ -126,10 +139,6 @@
                 // getValues funktionen är kopplad till känslofunktionerna , den summerar känslorna och uppdaterar mätaren när man klickar på knapparna
 
                 function getValues(love, hunger, fun, bath, tired) {
-                  const testMood = [];
-                  testMood.push(tamagotchi.love, tamagotchi.hunger);
-
-                  console.log(testMood);
 
                   var mood =
                     tamagotchi.love +
@@ -137,38 +146,11 @@
                     tamagotchi.fun +
                     tamagotchi.bath +
                     tamagotchi.tired;
-                  console.log(mood);
-
-                  switch (true) {
-                    case mood <= 10:
-                      document.getElementById("Moodmeter").style.width = "10%";
-                      document.getElementById("Moodmeter").style.backgroundImage =
-                        "linear-gradient(#ff4c4c, #ff5e5e, #ff7676, #ff5e5e, #ff4c4c)";
-                      break;
-                    case mood >= 11 && mood <= 20:
-                      document.getElementById("Moodmeter").style.width = "25%";
-                      document.getElementById("Moodmeter").style.backgroundImage =
-                        "linear-gradient(#ce7554, #cc8065, #ca8f79, #cc8065, #ce7554)";
-                      break;
-                    case mood >= 21 && mood <= 29:
-                      document.getElementById("Moodmeter").style.width = "50%";
-                      document.getElementById("Moodmeter").style.backgroundImage =
-                        "linear-gradient(#82b562, #8fb676, #a3b896, #8fb676, #82b562)";
-                      break;
-                    case mood >= 30 && mood <= 40:
-                      document.getElementById("Moodmeter").style.width = "75%";
-                      document.getElementById("Moodmeter").style.backgroundImage =
-                        "linear-gradient(#30ff6a, #7cffa1, #a2ffbe, #7cffa1, #30ff6a)";
-                      break;
-                    case mood >= 41:
-                      document.getElementById("Moodmeter").style.width = "100%";
-                      document.getElementById("Moodmeter").style.backgroundImage =
-                        "linear-gradient(#5aff34, #90ff77, #b8fda8, #90ff77, #5aff34)";
-                      break;
-                    default:
-                      document.getElementById("Moodmeter").style.backgroundColor =
-                        "#ffffff";
-                  }
+                  console.log("love = " + tamagotchi.love,
+                    "hunger = " + tamagotchi.hunger +
+                    "fun = " + tamagotchi.fun +
+                    "bath = " + tamagotchi.bath +
+                    "tired = " + tamagotchi.tired);
                 }
 
                 /*********  RÖRELSE   ******/

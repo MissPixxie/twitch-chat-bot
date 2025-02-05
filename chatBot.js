@@ -16,7 +16,7 @@ export const startBot = async (io) => {
 	// Get OAuth token
 	if (!process.env.USER_ACCESS_TOKEN) {
 		console.log("you need an access token");
-		return false;
+		return;
 	} else {
 		// Start WebSocket client and register handlers
 		const websocketClient = startWebSocketClient(
@@ -49,7 +49,6 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 			websocketSessionID = data.payload.session.id; // Register the Session ID it gives us
 			// Listen to EventSub, which joins the chatroom from your bot's account
 			registerEventSubListeners(OAuthToken);
-			//initTamagotchiWebSocketServer();
 			break;
 		case "notification": // An EventSub notification has occurred, such as channel.chat.message
 			switch (data.metadata.subscription_type) {
@@ -57,7 +56,7 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 					console.log(
 						`MSG #${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
 					);
-					let tamaAnswer = handleTamaMessages(
+					let tamaAnswer = await handleTamaMessages(
 						io,
 						data.payload.event.message.text,
 						data.payload.event.chatter_user_login
