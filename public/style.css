@@ -1,12 +1,11 @@
 #gamecontainer {
-  width: 2000px;
-  height: 600px;
+  width: 2120px;
   position: relative;
 }
 
 #tamaDiv {
   position: absolute;
-  padding-top: 305px;
+  padding-top: 500px;
 }
 
 #tamaDiv img {

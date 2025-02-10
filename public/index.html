@@ -12,23 +12,25 @@
                 socket.on("botMessage", (message) => {
                   switch(message) {
                     case "!love":
-                    love();
+                    love(socket);
                     break;
                     case "!feed":
-                      hunger();
+                      hunger(socket);
                       break;
                       case "!play":
-                        fun();
+                        fun(socket);
                         break;
                         case "!bath":
-                          bath();
+                          bath(socket);
                           break;
                           case "!sleep":
-                            sleep();
+                            tired(socket);
                             break;
                   }
                 })
-              });
+              }
+
+            );
 
               const tamagotchi = { love: 0, hunger: 0, fun: 0, bath: 0, tired: 0 };
 
@@ -80,8 +82,9 @@
 
                 // Funktionerna love, hunger, fun, bath och tired lägger till och tar bort värde ifrån objektet tamagotchi
                 //och kontaktar sedan getValues funktionen för att den ska uppdatera mätaren samtidigt som man klickar på någon av knapparna
-                function love() {
+                function love(socket) {
                   tamagotchi.love = check(tamagotchi.love, 5);
+                                    socket.emit("messageFromTama", tamagotchi)
                   getValues();
                   appreciation();
                 }
@@ -89,10 +92,10 @@
                 function hunger() {
                   tamagotchi.hunger = check(tamagotchi.hunger, 3);
                   tamagotchi.tired = check(tamagotchi.tired, -1);
+                                                      socket.emit("messageFromTama", tamagotchi)
 
                   getValues();
                   appreciation();
-                  closeOnFoodClick();
                 }
 
                 function fun() {
@@ -101,6 +104,7 @@
                   tamagotchi.hunger = check(tamagotchi.hunger, -2);
                   tamagotchi.bath = check(tamagotchi.bath, -1);
                   tamagotchi.tired = check(tamagotchi.tired, -2);
+                                                      socket.emit("messageFromTama", tamagotchi)
 
                   getValues();
                   appreciation();
@@ -108,6 +112,7 @@
 
                 function bath() {
                   tamagotchi.bath = check(tamagotchi.bath, 10);
+                                                      socket.emit("messageFromTama", tamagotchi)
 
                   getValues();
                   appreciation();
@@ -117,6 +122,7 @@
                   goSleep(5000);
                   tamagotchi.tired = check(tamagotchi.tired, 10);
                   tamagotchi.hunger = check(tamagotchi.hunger, -5);
+                                                      socket.emit("messageFromTama", tamagotchi)
 
                   getValues();
                 }
@@ -191,7 +197,7 @@
                 }
 
                 // Funktionen flip gör att snigeln rör sig fram och tillbaka och flippar bilden så den går i rätt riktning
-                var x = 200;
+                var x = 50;
                 var riktning = "höger";
                 //const maxWidth = window.innerWidth;
 
@@ -206,9 +212,9 @@
                     x = x - 1;
                     document.getElementById("tamaDiv").style.transform = "scaleX(-1)"; // flippar bilden för att snigeln ska gå i rätt riktning
                   }
-                  if (x == 800) {
+                  if (x == 1920) {
                     riktning = "vänster";
-                  } else if (x == 200) {
+                  } else if (x == 50) {
                     riktning = "höger";
                   }
                 }
@@ -232,7 +238,6 @@
 </head>
   <body>
     <div id="gamecontainer">
-      <div id="container">
       <div id="tamaDiv">
         <div class="tamagotchi"><img src="Images/tama1png.png" /></div>
         <div class="tamagotchi"><img src="Images/tama2png.png" /></div>
@@ -242,7 +247,6 @@
         <div class="tamagotchi"><img src="Images/tamasad.png" /></div>
         <div class="tamagotchi"><img src="Images/tamasad2.png" /></div>
       </div>
-    </div>
     </div>
   </body>
 </html>

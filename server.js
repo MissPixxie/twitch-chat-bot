@@ -2,10 +2,11 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
-import { startBot } from "./chatBot.js";
+import { startBot, startTamaSocket } from "./chatBot.js";
 import { updateEnvFile } from "./tokenManager.js";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { TamaSocket } from "./handleTamaMessages.js";
 
 dotenv.config();
 
@@ -95,6 +96,7 @@ httpInstance.listen(PORT, async () => {
 	// Attempt initial bot start
 	try {
 		let botStarted = await startBot(io);
+		let tamaSocketStarted = await startTamaSocket(io);
 		if (botStarted) {
 			console.log("Bot successfully started!");
 		} else {

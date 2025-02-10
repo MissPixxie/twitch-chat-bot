@@ -1,6 +1,6 @@
 import WebSocket, { WebSocketServer } from "ws";
 import dotenv from "dotenv";
-import { handleTamaMessages } from "./handleTamaMessages.js";
+import { Message, MessageHandler, TamaSocket } from "./handleTamaMessages.js";
 
 dotenv.config();
 
@@ -43,6 +43,12 @@ export function startWebSocketClient(OAuthToken, io) {
 	return websocketClient;
 }
 
+let tamaSocket;
+
+export async function startTamaSocket(io) {
+	tamaSocket = new TamaSocket(io);
+}
+
 async function handleWebSocketMessage(data, OAuthToken, io) {
 	switch (data.metadata.message_type) {
 		case "session_welcome": // First message you get from the WebSocket server when connecting
@@ -56,15 +62,20 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 					console.log(
 						`MSG #${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
 					);
-					let tamaAnswer = await handleTamaMessages(
-						io,
+					let newMessage = tamaSocket.sendMessage(
 						data.payload.event.message.text,
 						data.payload.event.chatter_user_login
 					);
-					if (tamaAnswer) {
-						sendChatMessage(tamaAnswer.toString(), OAuthToken);
+					// let tamaAnswer = await handleTamaMessages(
+					// 	io,
+					// 	data.payload.event.message.text,
+					// 	data.payload.event.chatter_user_login,
+					// 	"incomming"
+					// );
+					if (newMessage) {
+						sendChatMessage(newMessage.toString(), OAuthToken);
 					}
-					break;
+					tamaSocket.break;
 			}
 			break;
 	}
