@@ -2,11 +2,12 @@
 //
 //
 
+let health;
+
 class TamaSocket {
 	constructor(io) {
 		this.io = io;
 		this.createConnection();
-		this.socket;
 	}
 	createConnection() {
 		this.io.on("error", console.error);
@@ -15,7 +16,8 @@ class TamaSocket {
 			console.log("A client connected ");
 			this.socket = socket;
 			socket.on("messageFromTama", (newMessage) => {
-				console.log(newMessage);
+				health = newMessage;
+				currentHealth();
 			});
 		});
 	}
@@ -24,54 +26,32 @@ class TamaSocket {
 		let answer = returnMessage(message, chatter);
 		return answer;
 	}
-	// returnMessage() {
-	// 	this.socket.on("connect", (message) => {
-	// 		console.log(message);
-	// 		this.io.on("messageFromTama", (newMessage) => {
-	// 			console.log(newMessage);
-	// 		});
-	// 	});
-	// }
 }
 
-class MessageHandler {
-	constructor(socket) {
-		this.socket = socket;
+function currentHealth() {
+	for (let [key, value] of Object.entries(health)) {
+		console.log(key, value);
 	}
-	sendMessage(chatter, message) {
-		console.log(this.socket);
-		this.socket.emit("botMessage", message);
-		let answer = returnMessage(message, chatter);
-		return answer;
-	}
-	sendMessageToTama() {
-		io.on("messageFromTama", (newMessage) => {
-			console.log(newMessage);
-			//handleTamaMessages(io, newMessage, "outgoing");
-		});
-	}
+	//return health;
 }
 
-class Message {
-	constructor() {}
-	messageHandler(io, messageType, message) {
-		switch (messageType) {
-			case "botMessage":
-				//this.sendToTama(io, message);
-				io.emit("botMessage", message);
-				break;
-			case "messageFromTama":
-				//this.sendToTwitch();
-				io.on("messageFromTama", (newMessage) => {
-					console.log(newMessage);
-					//handleTamaMessages(io, newMessage, "outgoing");
-				});
-				break;
-		}
-	}
-}
+// class Message {
+// 	constructor() {}
+// 	messageHandler(io, messageType, message) {
+// 		switch (messageType) {
+// 			case "botMessage":
+// 				io.emit("botMessage", message);
+// 				break;
+// 			case "messageFromTama":
+// 				io.on("messageFromTama", (newMessage) => {
+// 					console.log(newMessage);
+// 				});
+// 				break;
+// 		}
+// 	}
+// }
 
-export { TamaSocket, Message, MessageHandler };
+export { TamaSocket };
 
 function getCommands() {
 	return [
@@ -80,24 +60,9 @@ function getCommands() {
 		" !sleep - Make Timmy take a nap",
 		" !play - Play with Timmy",
 		" !love - Give Timmy some love",
+		" !health - Get Timmy's current health",
 	];
 }
-
-// export async function handleTamaMessages(io, message, chatter, direction) {
-// 	if (direction === "incomming") {
-// 		let newMessage = new Message();
-// 		newMessage.messageHandler(io, "botMessage", message);
-// 	} else if (direction === "outgoing") {
-// 		let newMessage = new Message();
-// 		newMessage.sendToTwitch();
-// 	}
-// 	let answer = returnMessage(message, chatter);
-
-// 	// let newMessage = new Message();
-// 	// newMessage.messageHandler(io, "botMessage", message);
-
-// 	return answer;
-// }
 
 function returnMessage(message, chatter) {
 	let answer;
@@ -117,6 +82,9 @@ function returnMessage(message, chatter) {
 			break;
 		case "!love":
 			answer = `@${chatter} gave Timmy a hug`;
+			break;
+		case "!health":
+			answer = health;
 			break;
 		case "!timmycommands":
 			answer = getCommands();

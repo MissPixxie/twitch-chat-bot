@@ -1,6 +1,6 @@
 import WebSocket, { WebSocketServer } from "ws";
 import dotenv from "dotenv";
-import { Message, MessageHandler, TamaSocket } from "./handleTamaMessages.js";
+import { TamaSocket } from "./handleTamaMessages.js";
 
 dotenv.config();
 
@@ -66,13 +66,8 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 						data.payload.event.message.text,
 						data.payload.event.chatter_user_login
 					);
-					// let tamaAnswer = await handleTamaMessages(
-					// 	io,
-					// 	data.payload.event.message.text,
-					// 	data.payload.event.chatter_user_login,
-					// 	"incomming"
-					// );
 					if (newMessage) {
+						console.log(newMessage);
 						sendChatMessage(newMessage.toString(), OAuthToken);
 					}
 					tamaSocket.break;
