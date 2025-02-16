@@ -1,4 +1,4 @@
-import WebSocket, { WebSocketServer } from "ws";
+import WebSocket, { WebSocketServer, RawData } from "ws";
 import { Server } from "socket.io";
 import dotenv from "dotenv";
 import { TamaSocket } from "./handleTamaMessages.js";
@@ -10,10 +10,11 @@ const CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 const CHAT_CHANNEL_USER_ID = process.env.CHAT_CHANNEL_USER_ID; // This is the User ID of the channel that the bot will join and listen to chat messages of
 const EVENTSUB_WEBSOCKET_URL = "wss://eventsub.wss.twitch.tv/ws";
 
-var websocketSessionID;
+let websocketSessionID: string | undefined;
+let tamaSocket: TamaSocket;
 
 // Start executing the bot from here
-export const startBot = async (io) => {
+export const startBot = async (io: Server): Promise<boolean | void> => {
 	console.log(io);
 	// Get OAuth token
 	if (!process.env.USER_ACCESS_TOKEN) {
@@ -29,7 +30,10 @@ export const startBot = async (io) => {
 	}
 };
 
-export function startWebSocketClient(OAuthToken, io) {
+export function startWebSocketClient(
+	OAuthToken: string,
+	io: Server
+): WebSocket {
 	let websocketClient = new WebSocket(EVENTSUB_WEBSOCKET_URL);
 
 	websocketClient.on("error", console.error);
@@ -38,20 +42,41 @@ export function startWebSocketClient(OAuthToken, io) {
 		console.log("WebSocket connection opened to " + EVENTSUB_WEBSOCKET_URL);
 	});
 
-	websocketClient.on("message", (data) => {
+	websocketClient.on("message", (data: WebSocket.RawData) => {
 		handleWebSocketMessage(JSON.parse(data.toString()), OAuthToken, io);
 	});
 
 	return websocketClient;
 }
 
-let tamaSocket;
-
-export async function startTamaSocket(io) {
+export async function startTamaSocket(io: Server) {
 	tamaSocket = new TamaSocket(io);
 }
 
-async function handleWebSocketMessage(data, OAuthToken, io) {
+type TwitchData = {
+	metadata: {
+		message_type: string;
+		subscription_type: string;
+	};
+	payload: {
+		session: {
+			id: string;
+		};
+		event: {
+			broadcaster_user_login: string;
+			chatter_user_login: string;
+			message: {
+				text: string;
+			};
+		};
+	};
+};
+
+async function handleWebSocketMessage(
+	data: TwitchData,
+	OAuthToken: string,
+	io: Server
+) {
 	switch (data.metadata.message_type) {
 		case "session_welcome": // First message you get from the WebSocket server when connecting
 			websocketSessionID = data.payload.session.id; // Register the Session ID it gives us
@@ -92,12 +117,12 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 }
 
 // Sends messages back to chat
-export async function sendChatMessage(chatMessage, OAuthToken) {
+export async function sendChatMessage(chatMessage: string, OAuthToken: string) {
 	let response = await fetch("https://api.twitch.tv/helix/chat/messages", {
 		method: "POST",
 		headers: {
 			Authorization: "Bearer " + OAuthToken,
-			"Client-Id": CLIENT_ID,
+			"Client-Id": CLIENT_ID!,
 			"Content-Type": "application/json",
 		},
 		body: JSON.stringify({
@@ -115,7 +140,7 @@ export async function sendChatMessage(chatMessage, OAuthToken) {
 	}
 }
 
-async function registerEventSubListeners(OAuthToken) {
+async function registerEventSubListeners(OAuthToken: string) {
 	// Register channel.chat.message
 	let response = await fetch(
 		"https://api.twitch.tv/helix/eventsub/subscriptions",
@@ -123,7 +148,7 @@ async function registerEventSubListeners(OAuthToken) {
 			method: "POST",
 			headers: {
 				Authorization: "Bearer " + OAuthToken,
-				"Client-Id": CLIENT_ID,
+				"Client-Id": CLIENT_ID!,
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({

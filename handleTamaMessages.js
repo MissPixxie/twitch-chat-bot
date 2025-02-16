@@ -1,7 +1,7 @@
 //
 //
 //
-import { sendChatMessage } from "./chatBot.js";
+import { sendChatMessage } from "./chatBot.ts";
 
 class TamaSocket {
 	constructor(io) {
