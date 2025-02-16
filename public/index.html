@@ -33,13 +33,10 @@
 						tired(socket);
 						break;
 					case "!health":
+						currentHealth(socket);
 						break;
 				}
 			});
-
-			// socket.on("botMessage", (message, callback) => {
-			// 	callback(tamagotchi);
-			// });
 
 			const tamagotchi = {
 				love: 0,
@@ -49,18 +46,9 @@
 				tired: 0,
 			};
 
-			// function currentHealth(socket) {
-			//     //let healthCheck = getValues();
-			//     // for (let [key, value] of Object.entries(tamagotchi)) {
-			//     //   console.log(key, value);
-			//     // }
-			//     socket.emit("messageFromTama", tamagotchi)
-			//   }
-
-			// function currentHealth() {
-			//   for(let [key, value] of Object.entries(tamagotchi))
-			//   return key + value;
-			// }
+			function currentHealth(socket) {
+				socket.emit("messageFromTama", tamagotchi);
+			}
 
 			// function dropApple() {
 			// 	let id = 0;

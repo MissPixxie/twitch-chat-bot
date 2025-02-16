@@ -1,6 +1,7 @@
 //
 //
 //
+import { sendChatMessage } from "./chatBot.js";
 
 let health;
 
@@ -8,7 +9,14 @@ class TamaSocket {
 	constructor(io) {
 		this.io = io;
 		this.createConnection();
-		this.latestHealth = null;
+		this.latestHealth = {
+			love: 0,
+			hunger: 0,
+			fun: 0,
+			bath: 0,
+			sleep: 0,
+		};
+		this.OAuthToken = null;
 	}
 	createConnection() {
 		this.io.on("error", console.error);
@@ -16,18 +24,26 @@ class TamaSocket {
 		this.io.on("connection", (socket) => {
 			console.log("A client connected ");
 			this.socket = socket;
-			//this.checkHealth(socket);
 			socket.on("messageFromTama", (newMessage) => {
-				for (let [key, value] of Object.entries(newMessage)) {
-					this.latestHealth = key + value;
-				}
-
-				//currentHealth();
-				console.log(this.latestHealth + " hello?");
-				//returnMessage();
+				this.updateHealth(newMessage);
 			});
 		});
 	}
+
+	updateHealth(newHealth) {
+		for (let [key, value] of Object.entries(newHealth)) {
+			if (this.latestHealth.hasOwnProperty(key)) {
+				this.latestHealth[key] = value;
+			}
+		}
+		console.log(this.latestHealth);
+		let timmysHealth = "";
+		for (let [key, value] of Object.entries(this.latestHealth)) {
+			timmysHealth += ` ${key}: ${value}`;
+		}
+		sendChatMessage(`Timmy's health is ${timmysHealth}`, this.OAuthToken);
+	}
+
 	availableCommands(command) {
 		console.log("available commands function" + command);
 		const commands = [
@@ -47,10 +63,15 @@ class TamaSocket {
 		}
 	}
 
-	sendMessage(message, chatter) {
-		this.io.timeout(10000).emit("botMessage", message);
-		let answer = this.returnMessage(message, chatter);
-		return answer;
+	sendMessage(message, chatter, OAuthToken) {
+		this.OAuthToken = OAuthToken;
+		if (message === "!health") {
+			this.io.emit("botMessage", message);
+		} else {
+			this.io.emit("botMessage", message);
+			let answer = this.returnMessage(message, chatter);
+			return answer;
+		}
 	}
 
 	returnMessage(message, chatter) {
@@ -67,7 +88,7 @@ class TamaSocket {
 				answer = `@${chatter} told a story about their life and Timmy fell asleep 💤`;
 				break;
 			case "!play":
-				answer = `@${chatter} played a game with Timmy ⚽`;
+				answer = `@${chatter} played a game with Timmy 🎮`;
 				break;
 			case "!love":
 				answer = `@${chatter} gave Timmy a hug ❤️`;

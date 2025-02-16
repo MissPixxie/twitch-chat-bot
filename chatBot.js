@@ -77,7 +77,8 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 					if (findCommand !== -1) {
 						let newMessage = tamaSocket.sendMessage(
 							data.payload.event.message.text,
-							data.payload.event.chatter_user_login
+							data.payload.event.chatter_user_login,
+							OAuthToken
 						);
 						if (newMessage) {
 							sendChatMessage(newMessage.toString(), OAuthToken);
@@ -89,7 +90,7 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 }
 
 // Sends messages back to chat
-async function sendChatMessage(chatMessage, OAuthToken) {
+export async function sendChatMessage(chatMessage, OAuthToken) {
 	let response = await fetch("https://api.twitch.tv/helix/chat/messages", {
 		method: "POST",
 		headers: {
