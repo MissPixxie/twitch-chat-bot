@@ -5,16 +5,17 @@
 		<link rel="stylesheet" href="style.css" />
 		<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
 		<script>
+			// SOCKET STUFF //
 			const socket = io("http://localhost:3000", {
 				timeout: 10000,
 			});
 
 			socket.on("connect", () => {
 				console.log("connected");
+				console.log(socket.id);
 			});
 
 			socket.on("botMessage", (message) => {
-				console.log(message);
 				switch (message) {
 					case "!love":
 						love(socket);
@@ -33,10 +34,20 @@
 						tired(socket);
 						break;
 					case "!health":
-						currentHealth(socket);
+						socket.emit("messageFromTama", tamagotchi);
 						break;
 				}
 			});
+
+			// socket.on("healthCheck", () => {
+			// 	socket.emit("messageFromTama", tamagotchi);
+			// });
+
+			// END OF SOCKET STUFF //
+
+			// function currentHealth(socket) {
+			// 	socket.emit("messageFromTama", tamagotchi);
+			// }
 
 			const tamagotchi = {
 				love: 0,
@@ -45,10 +56,6 @@
 				bath: 0,
 				tired: 0,
 			};
-
-			function currentHealth(socket) {
-				socket.emit("messageFromTama", tamagotchi);
-			}
 
 			// function dropApple() {
 			// 	let id = 0;
@@ -137,7 +144,7 @@
 			}
 
 			function tired() {
-				goSleep(5000);
+				goSleep(15000);
 				tamagotchi.tired = check(tamagotchi.tired, 10);
 				tamagotchi.hunger = check(tamagotchi.hunger, -5);
 			}
@@ -150,7 +157,7 @@
 				tamagotchi.bath = check(tamagotchi.bath, -1);
 				tamagotchi.tired = check(tamagotchi.tired, -1);
 				if (tamagotchi.tired == 0) {
-					goSleep(36000);
+					goSleep(15000);
 					tamagotchi.tired = 10;
 				}
 			}
