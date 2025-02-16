@@ -60,22 +60,35 @@ async function handleWebSocketMessage(data, OAuthToken, io) {
 			switch (data.metadata.subscription_type) {
 				case "channel.chat.message":
 					console.log(
-						`MSG #${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
+						`#${data.payload.event.broadcaster_user_login} <${data.payload.event.chatter_user_login}> ${data.payload.event.message.text}`
 					);
-					let newMessage = tamaSocket.sendMessage(
-						data.payload.event.message.text,
-						data.payload.event.chatter_user_login
+					const commands = [
+						"!love",
+						"!feed",
+						"!play",
+						"!bath",
+						"!sleep",
+						"!health",
+					];
+
+					const findCommand = commands.indexOf(
+						data.payload.event.message.text
 					);
-					if (newMessage) {
-						console.log(newMessage);
-						sendChatMessage(newMessage.toString(), OAuthToken);
+					if (findCommand !== -1) {
+						let newMessage = tamaSocket.sendMessage(
+							data.payload.event.message.text,
+							data.payload.event.chatter_user_login
+						);
+						if (newMessage) {
+							sendChatMessage(newMessage.toString(), OAuthToken);
+						}
 					}
-					tamaSocket.break;
 			}
 			break;
 	}
 }
 
+// Sends messages back to chat
 async function sendChatMessage(chatMessage, OAuthToken) {
 	let response = await fetch("https://api.twitch.tv/helix/chat/messages", {
 		method: "POST",
@@ -135,7 +148,5 @@ async function registerEventSubListeners(OAuthToken) {
 	} else {
 		const data = await response.json();
 		console.log(`Subscribed to channel.chat.message [${data.data[0].id}]`);
-		//const server = tamaServer();
-		//test();
 	}
 }

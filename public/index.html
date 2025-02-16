@@ -1,248 +1,276 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="style.css" />
-<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-            <script>
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="stylesheet" href="style.css" />
+		<script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+		<script>
+			const socket = io("http://localhost:3000", {
+				timeout: 10000,
+			});
 
-              const socket = io("http://localhost:3000");
-              socket.on("connect", (message) => {
-                console.log("connected")
-                socket.on("botMessage", (message) => {
-                  switch(message) {
-                    case "!love":
-                    love(socket);
-                    break;
-                    case "!feed":
-                      dropApple();
-                      hunger(socket);
-                      break;
-                      case "!play":
-                        fun(socket);
-                        break;
-                        case "!bath":
-                          bath(socket);
-                          break;
-                          case "!sleep":
-                            tired(socket);
-                            break;
-                            case "!health":
-                              currentHealth(socket);
-                              break;
-                  }
-                })
-              }
+			socket.on("connect", () => {
+				console.log("connected");
+			});
 
-            );
+			socket.on("botMessage", (message) => {
+				console.log(message);
+				switch (message) {
+					case "!love":
+						love(socket);
+						break;
+					case "!feed":
+						dropApple();
+						hunger(socket);
+						break;
+					case "!play":
+						fun(socket);
+						break;
+					case "!bath":
+						bath(socket);
+						break;
+					case "!sleep":
+						tired(socket);
+						break;
+					case "!health":
+						break;
+				}
+			});
 
-              const tamagotchi = { love: 0, hunger: 0, fun: 0, bath: 0, tired: 0 };
+			// socket.on("botMessage", (message, callback) => {
+			// 	callback(tamagotchi);
+			// });
 
-                          function currentHealth(socket) {
-                              //let healthCheck = getValues();
-                              for (let [key, value] of Object.entries(tamagotchi)) {
-                                console.log(key, value);
-                              }
-                              socket.emit("messageFromTama", tamagotchi)
-                            }
+			const tamagotchi = {
+				love: 0,
+				hunger: 0,
+				fun: 0,
+				bath: 0,
+				tired: 0,
+			};
 
-              function dropApple() {
-                let id = 0;
-                const appleElement = document.getElementById("apple");
-                let pos = 0;
-                clearInterval(id);
-                id = setInterval(frame, 5);
-                function frame() {
-                  if(pos === 1100) {
-                    clearInterval(id);
-                  }
-                  else {
-                    pos++;
-                    appleElement.style.top = pos + "px";
-                  }
-                }
-              }
+			// function currentHealth(socket) {
+			//     //let healthCheck = getValues();
+			//     // for (let [key, value] of Object.entries(tamagotchi)) {
+			//     //   console.log(key, value);
+			//     // }
+			//     socket.emit("messageFromTama", tamagotchi)
+			//   }
 
-                // Function for checking so the values does not exceed 10 or goes under 0
-                function check(val, inc) {
-                  var newval = val + inc;
-                  if (newval > 10) {
-                    newval = 10;
-                  }
-                  if (newval < 0) {
-                    newval = 0;
-                  }
-                  return newval;
-                }
+			// function currentHealth() {
+			//   for(let [key, value] of Object.entries(tamagotchi))
+			//   return key + value;
+			// }
 
-                function sleep(ms) {
-                  return new Promise((r) => setTimeout(r, ms));
-                }
+			// function dropApple() {
+			// 	let id = 0;
+			// 	const appleElement = document.getElementById("apple");
+			// 	let pos = 0;
+			// 	clearInterval(id);
+			// 	id = setInterval(frame, 5);
+			// 	function frame() {
+			// 		if (pos === 1100) {
+			// 			clearInterval(id);
+			// 		} else {
+			// 			pos++;
+			// 			appleElement.style.top = pos + "px";
+			// 		}
+			// 	}
+			// }
 
-                // Stops the movement of the movement images and shows the happy image and then restarts the movement
-                async function appreciation() {
-                  stop();
-                  var tama = document.getElementsByClassName("tamagotchi");
-                  for (var i = 0; i < tama.length; i++) {
-                    tama[i].style.display = "none";
-                  }
-                  tama[2].style.display = "block";
-                  await sleep(1000);
-                  tama[0].style.display = "block";
-                  tama[2].style.display = "none";
-                  stop();
-                  start();
-                }
+			// Function for checking so the values does not exceed 10 or goes under 0
+			function check(val, inc) {
+				var newval = val + inc;
+				if (newval > 10) {
+					newval = 10;
+				}
+				if (newval < 0) {
+					newval = 0;
+				}
+				return newval;
+			}
 
-                // Function for removing image of the tamagotchi when it sleeps
-                async function goSleep(ms) {
-                  stop();
-                  var tama = document.getElementsByClassName("tamagotchi");
-                  for (var i = 0; i < tama.length; i++) {
-                    tama[i].style.display = "none";
-                  }
-                  await sleep(ms);
-                  tama[0].style.display = "block";
-                  stop();
-                  start();
-                }
+			function sleep(ms) {
+				return new Promise((r) => setTimeout(r, ms));
+			}
 
-                // Functions love, hunger, fun, bath och tired ads and removes values from the tamagotchi
-                function love() {
-                  tamagotchi.love = check(tamagotchi.love, 5);
-                  appreciation();
-                  currentHealth();
-                }
+			// Stops the movement of the movement images and shows the happy image and then restarts the movement
+			async function appreciation() {
+				stop();
+				var tama = document.getElementsByClassName("tamagotchi");
+				for (var i = 0; i < tama.length; i++) {
+					tama[i].style.display = "none";
+				}
+				tama[2].style.display = "block";
+				await sleep(1000);
+				tama[0].style.display = "block";
+				tama[2].style.display = "none";
+				stop();
+				start();
+			}
 
-                function hunger() {
-                  tamagotchi.hunger = check(tamagotchi.hunger, 3);
-                  tamagotchi.tired = check(tamagotchi.tired, -1);
-                  appreciation();
-                }
+			// Function for removing image of the tamagotchi when it sleeps
+			async function goSleep(ms) {
+				stop();
+				var tama = document.getElementsByClassName("tamagotchi");
+				for (var i = 0; i < tama.length; i++) {
+					tama[i].style.display = "none";
+				}
+				await sleep(ms);
+				tama[0].style.display = "block";
+				stop();
+				start();
+			}
 
-                function fun() {
-                  tamagotchi.fun = check(tamagotchi.fun, 5);
-                  tamagotchi.love = check(tamagotchi.love, 1);
-                  tamagotchi.hunger = check(tamagotchi.hunger, -2);
-                  tamagotchi.bath = check(tamagotchi.bath, -1);
-                  tamagotchi.tired = check(tamagotchi.tired, -2);
-                  appreciation();
-                }
+			// Functions love, hunger, fun, bath och tired ads and removes values from the tamagotchi
+			function love() {
+				tamagotchi.love = check(tamagotchi.love, 5);
+				appreciation();
+			}
 
-                function bath() {
-                  tamagotchi.bath = check(tamagotchi.bath, 10);
-                  appreciation();
-                }
+			function hunger() {
+				tamagotchi.hunger = check(tamagotchi.hunger, 3);
+				tamagotchi.tired = check(tamagotchi.tired, -1);
+				appreciation();
+			}
 
-                function tired() {
-                  goSleep(5000);
-                  tamagotchi.tired = check(tamagotchi.tired, 10);
-                  tamagotchi.hunger = check(tamagotchi.hunger, -5);
-                }
+			function fun() {
+				tamagotchi.fun = check(tamagotchi.fun, 5);
+				tamagotchi.love = check(tamagotchi.love, 1);
+				tamagotchi.hunger = check(tamagotchi.hunger, -2);
+				tamagotchi.bath = check(tamagotchi.bath, -1);
+				tamagotchi.tired = check(tamagotchi.tired, -2);
+				appreciation();
+			}
 
-                // Function for removing values from health with timer
-                function time() {
-                  tamagotchi.love = check(tamagotchi.love, -2);
-                  tamagotchi.hunger = check(tamagotchi.hunger, -1);
-                  tamagotchi.fun = check(tamagotchi.fun, -2);
-                  tamagotchi.bath = check(tamagotchi.bath, -1);
-                  tamagotchi.tired = check(tamagotchi.tired, -1);
-                  if (tamagotchi.tired == 0) {
-                    goSleep(36000);
-                    tamagotchi.tired = 10;
-                  }
-                }
-                setInterval(time, 360000);
+			function bath() {
+				tamagotchi.bath = check(tamagotchi.bath, 10);
+				appreciation();
+			}
 
-                /*********  Movement   ******/
+			function tired() {
+				goSleep(5000);
+				tamagotchi.tired = check(tamagotchi.tired, 10);
+				tamagotchi.hunger = check(tamagotchi.hunger, -5);
+			}
 
-                // Function for looping the images in the tamagotchi class
-                var slideshow = 0;
+			// Function for removing values from health with timer
+			function time() {
+				tamagotchi.love = check(tamagotchi.love, -2);
+				tamagotchi.hunger = check(tamagotchi.hunger, -1);
+				tamagotchi.fun = check(tamagotchi.fun, -2);
+				tamagotchi.bath = check(tamagotchi.bath, -1);
+				tamagotchi.tired = check(tamagotchi.tired, -1);
+				if (tamagotchi.tired == 0) {
+					goSleep(36000);
+					tamagotchi.tired = 10;
+				}
+			}
+			setInterval(time, 360000);
 
-                function tamaSlide() {
-                  var mood =
-                    tamagotchi.love +
-                    tamagotchi.hunger +
-                    tamagotchi.fun +
-                    tamagotchi.bath +
-                    tamagotchi.tired;
-                  var tama = document.getElementsByClassName("tamagotchi");
-                  for (var i = 0; i < tama.length; i++) {
-                    tama[i].style.display = "none";
-                  }
-                  slideshow++;
-                  if (mood > 20) {
-                    if (slideshow > 2) {
-                      slideshow = 1;
-                    }
-                    tama[slideshow - 1].style.display = "block";
-                  } else {
-                    if (mood >= 11 && mood <= 19) {
-                      if (slideshow > 5) {
-                        slideshow = 4;
-                      }
-                      tama[slideshow - 1].style.display = "block";
-                    } else {
-                      if (slideshow > 7) {
-                        slideshow = 6;
-                      }
-                      tama[slideshow - 1].style.display = "block";
-                    }
-                  }
-                }
+			function getValues(love, hunger, fun, bath, tired) {
+				let mood =
+					tamagotchi.love +
+					tamagotchi.hunger +
+					tamagotchi.fun +
+					tamagotchi.bath +
+					tamagotchi.tired;
+				return mood;
+			}
 
-                // Function for moving the tamagotchi and flipping the images so in moves in the right direction
-                var x = 50;
-                var riktning = "höger";
-                //const maxWidth = window.innerWidth;
+			/*********  Movement   ******/
 
-                function flip() {
-                  element = document.getElementById("tamaDiv");
-                  element.style.right = x + "px";
+			// Function for looping the images in the tamagotchi class
+			var slideshow = 0;
 
-                  if (riktning == "höger") {
-                    x = x + 1;
-                    element.style.transform = "scaleX(1)";
-                  } else if (riktning == "vänster") {
-                    x = x - 1;
-                    document.getElementById("tamaDiv").style.transform = "scaleX(-1)"; // flips the images
-                  }
-                  if (x == 1920) {
-                    riktning = "vänster";
-                  } else if (x == 50) {
-                    riktning = "höger";
-                  }
-                }
+			function tamaSlide() {
+				var mood =
+					tamagotchi.love +
+					tamagotchi.hunger +
+					tamagotchi.fun +
+					tamagotchi.bath +
+					tamagotchi.tired;
+				var tama = document.getElementsByClassName("tamagotchi");
+				for (var i = 0; i < tama.length; i++) {
+					tama[i].style.display = "none";
+				}
+				slideshow++;
+				if (mood > 20) {
+					if (slideshow > 2) {
+						slideshow = 1;
+					}
+					tama[slideshow - 1].style.display = "block";
+				} else {
+					if (mood >= 11 && mood <= 19) {
+						if (slideshow > 5) {
+							slideshow = 4;
+						}
+						tama[slideshow - 1].style.display = "block";
+					} else {
+						if (slideshow > 7) {
+							slideshow = 6;
+						}
+						tama[slideshow - 1].style.display = "block";
+					}
+				}
+			}
 
-                var tamaMove = setInterval(tamaSlide, 900);
-                var tamaFlip = setInterval(flip, 30);
+			// Function for moving the tamagotchi and flipping the images so in moves in the right direction
+			var x = 50;
+			var riktning = "höger";
+			//const maxWidth = window.innerWidth;
 
-                // Start and stops the tamaMove and flip functions
+			function flip() {
+				element = document.getElementById("tamaDiv");
+				element.style.right = x + "px";
 
-                function stop() {
-                  clearInterval(tamaMove);
-                  clearInterval(tamaFlip);
-                }
+				if (riktning == "höger") {
+					x = x + 1;
+					element.style.transform = "scaleX(1)";
+				} else if (riktning == "vänster") {
+					x = x - 1;
+					document.getElementById("tamaDiv").style.transform =
+						"scaleX(-1)"; // flips the images
+				}
+				if (x == 1920) {
+					riktning = "vänster";
+				} else if (x == 50) {
+					riktning = "höger";
+				}
+			}
 
-                function start() {
-                  tamaMove = setInterval(tamaSlide, 900);
-                  tamaFlip = setInterval(flip, 30);
-                }
+			var tamaMove = setInterval(tamaSlide, 900);
+			var tamaFlip = setInterval(flip, 30);
 
-            </script>
-</head>
-  <body>
-    <div id="gamecontainer">
-      <div id="apple"><img src="Images/apple.png" /></div>
-      <div id="tamaDiv">
-        <div class="tamagotchi"><img src="Images/tama1png.png" /></div>
-        <div class="tamagotchi"><img src="Images/tama2png.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamahappy.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamaunhappy.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamaunhappy2.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamasad.png" /></div>
-        <div class="tamagotchi"><img src="Images/tamasad2.png" /></div>
-      </div>
-    </div>
-  </body>
+			// Start and stops the tamaMove and flip functions
+
+			function stop() {
+				clearInterval(tamaMove);
+				clearInterval(tamaFlip);
+			}
+
+			function start() {
+				tamaMove = setInterval(tamaSlide, 900);
+				tamaFlip = setInterval(flip, 30);
+			}
+		</script>
+	</head>
+	<body>
+		<div id="gamecontainer">
+			<div id="apple"><img src="Images/apple.png" /></div>
+			<div id="tamaDiv">
+				<div class="tamagotchi"><img src="Images/tama1png.png" /></div>
+				<div class="tamagotchi"><img src="Images/tama2png.png" /></div>
+				<div class="tamagotchi"><img src="Images/tamahappy.png" /></div>
+				<div class="tamagotchi">
+					<img src="Images/tamaunhappy.png" />
+				</div>
+				<div class="tamagotchi">
+					<img src="Images/tamaunhappy2.png" />
+				</div>
+				<div class="tamagotchi"><img src="Images/tamasad.png" /></div>
+				<div class="tamagotchi"><img src="Images/tamasad2.png" /></div>
+			</div>
+		</div>
+	</body>
 </html>
