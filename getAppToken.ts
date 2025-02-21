@@ -1,14 +1,11 @@
 import dotenv from "dotenv";
-import { startBot } from "./chatBot.js";
 
 dotenv.config();
-
-// Hämtar token för applicationen som är upplagd på twitch developer console
 
 const TOKEN_URL = "https://id.twitch.tv/oauth2/token";
 const REQUEST_BODY = `client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`;
 
-export const getAppToken = async () => {
+export const getAppToken = async (): Promise<void> => {
 	try {
 		const response = await fetch(TOKEN_URL, {
 			method: "POST",

@@ -1,10 +1,14 @@
 //
 //
 //
-import { sendChatMessage } from "./chatBot.ts";
+import { sendChatMessage } from "./chatBot";
+import { Server } from "socket.io";
 
 class TamaSocket {
-	constructor(io) {
+	io: Server;
+	OAuthToken: string | null;
+
+	constructor(io: Server) {
 		this.io = io;
 		this.createConnection();
 		this.OAuthToken = null;
@@ -14,7 +18,6 @@ class TamaSocket {
 
 		this.io.on("connection", (socket) => {
 			console.log("A client connected ");
-			this.socket = socket;
 			socket.on("messageFromTama", (newMessage) => {
 				console.log(newMessage);
 				this.updateHealth(newMessage);
@@ -22,18 +25,20 @@ class TamaSocket {
 		});
 	}
 
-	updateHealth(newHealth) {
+	updateHealth(newHealth: object) {
 		let timmysHealth = "";
 		for (let [key, value] of Object.entries(newHealth)) {
 			timmysHealth += ` ${key}: ${value}`;
 		}
-		sendChatMessage(
-			`Timmy's health is ${timmysHealth} 🔋`,
-			this.OAuthToken
-		);
+		if (this.OAuthToken !== null) {
+			sendChatMessage(
+				`Timmy's health is ${timmysHealth} 🔋`,
+				this.OAuthToken
+			);
+		}
 	}
 
-	sendMessage(message, chatter, OAuthToken) {
+	sendMessage(message: string, chatter: string, OAuthToken: string) {
 		this.OAuthToken = OAuthToken;
 		this.io.emit("botMessage", message);
 		if (message !== "!health") {
@@ -41,8 +46,8 @@ class TamaSocket {
 		}
 	}
 
-	returnMessage(message, chatter) {
-		let answer;
+	returnMessage(message: string, chatter: string): string | string[] | null {
+		let answer: string | string[] | null = null;
 
 		switch (message) {
 			case "!feed":

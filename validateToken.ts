@@ -1,5 +1,5 @@
 // Validate token
-export async function validateToken(token) {
+export async function validateToken(token: string) {
 	try {
 		const response = await fetch("https://id.twitch.tv/oauth2/validate", {
 			method: "GET",

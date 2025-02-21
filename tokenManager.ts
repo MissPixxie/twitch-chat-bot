@@ -2,7 +2,7 @@ import fs from "fs/promises";
 import path from "path";
 import dotenv from "dotenv";
 
-export async function updateEnvFile(key, value) {
+export async function updateEnvFile(key: string, value: string) {
 	try {
 		const envPath = path.resolve(process.cwd(), ".env");
 		let envContent = await fs.readFile(envPath, "utf-8");

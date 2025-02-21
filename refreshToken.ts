@@ -10,10 +10,10 @@ const TOKEN_URL = "https://id.twitch.tv/oauth2/token";
 
 export async function refreshAccessToken() {
 	const params = new URLSearchParams({
-		client_id: process.env.TWITCH_CLIENT_ID,
-		client_secret: process.env.TWITCH_CLIENT_SECRET,
+		client_id: process.env.TWITCH_CLIENT_ID!,
+		client_secret: process.env.TWITCH_CLIENT_SECRET!,
 		grant_type: "refresh_token",
-		refresh_token: process.env.REFRESH_TOKEN,
+		refresh_token: process.env.REFRESH_TOKEN!,
 	});
 
 	const response = await fetch(TOKEN_URL, {
